@@ -12,7 +12,6 @@ export const requestHandler = (req: IncomingMessage, res: ServerResponse) => {
       if (req.url === '/api/users') {
         getAllUsers(req, res);
       } else if (urlParts.length === 4 && urlParts[1] === 'api' && urlParts[2] === 'users' && urlParts[3]) {
-        console.log('trigger');
         getUserByIdHandler(req, res, urlParts[3]);
       } else {
         res.writeHead(404);
