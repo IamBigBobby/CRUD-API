@@ -95,6 +95,19 @@ raw mode:
 DELETE http://localhost:4000/api/users/<userId>
 ```
 
+## Testing
+
+start server
+```bash
+npm start:dev
+```
+
+run testing
+
+```bash
+npm test
+```
+
 ## Technologies
 
 - Node.js
