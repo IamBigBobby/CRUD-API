@@ -5,114 +5,114 @@ import { v4 as uuidv4, validate as isUuid } from 'uuid';
 
 const users: User[] = [];
 
-export const getAllUsers = (req: IncomingMessage, res: ServerResponse) => {
-  res.writeHead(200);
-  res.end(JSON.stringify(users));
+export const getAllUsers = (request: IncomingMessage, response: ServerResponse) => {
+  response.writeHead(200);
+  response.end(JSON.stringify(users));
 };
 
-export const getUserByIdHandler = (req: IncomingMessage, res: ServerResponse, userId: string) => {
+export const getUserByIdHandler = (request: IncomingMessage, response: ServerResponse, userId: string) => {
   if (!isUuid(userId)) {
-    res.writeHead(400);
-    res.end(JSON.stringify({ message: 'Invalid user ID' }));
+    response.writeHead(400);
+    response.end(JSON.stringify({ message: 'Invalid user ID' }));
     return;
   }
 
   const user = users.find(u => u.id === userId);
   if (!user) {
-    res.writeHead(404);
-    res.end(JSON.stringify({ message: 'User not found' }));
+    response.writeHead(404);
+    response.end(JSON.stringify({ message: 'User not found' }));
     return;
   }
 
-  res.writeHead(200);
-  res.end(JSON.stringify(user));
+  response.writeHead(200);
+  response.end(JSON.stringify(user));
 };
 
-export const createUserHandler = (req: IncomingMessage, res: ServerResponse) => {
+export const createUserHandler = (request: IncomingMessage, response: ServerResponse) => {
   let body: Buffer[] = [];
 
-  req.on('data', chunk => {
+  request.on('data', chunk => {
     body.push(chunk);
   });
 
-  req.on('end', () => {
+  request.on('end', () => {
     try {
       const parsedBody = Buffer.concat(body).toString();
       const { username, age, hobbies } = JSON.parse(parsedBody);
 
       if (!username || typeof age !== 'number' || !Array.isArray(hobbies)) {
-        res.writeHead(400);
-        res.end(JSON.stringify({ message: 'Invalid data format' }));
+        response.writeHead(400);
+        response.end(JSON.stringify({ message: 'Invalid data format' }));
         return;
       }
 
       const newUser = createUser(username, age, hobbies);
       users.push(newUser);
 
-      res.writeHead(201);
-      res.end(JSON.stringify(newUser));
+      response.writeHead(201);
+      response.end(JSON.stringify(newUser));
     } catch (error) {
-      res.writeHead(500);
-      res.end(JSON.stringify({ message: 'Server error' }));
+      response.writeHead(500);
+      response.end(JSON.stringify({ message: 'Server error' }));
     }
   });
 };
 
-export const updateUserHandler = (req: IncomingMessage, res: ServerResponse, userId: string) => {
+export const updateUserHandler = (request: IncomingMessage, response: ServerResponse, userId: string) => {
   if (!isUuid(userId)) {
-    res.writeHead(400);
-    res.end(JSON.stringify({ message: 'Invalid user ID' }));
+    response.writeHead(400);
+    response.end(JSON.stringify({ message: 'Invalid user ID' }));
     return;
   }
 
   const userIndex = users.findIndex(u => u.id === userId);
   if (userIndex === -1) {
-    res.writeHead(404);
-    res.end(JSON.stringify({ message: 'User not found' }));
+    response.writeHead(404);
+    response.end(JSON.stringify({ message: 'User not found' }));
     return;
   }
 
   let body: Buffer[] = [];
-  req.on('data', chunk => {
+  request.on('data', chunk => {
     body.push(chunk);
   });
 
-  req.on('end', () => {
+  request.on('end', () => {
     try {
       const parsedBody = Buffer.concat(body).toString();
       const { username, age, hobbies } = JSON.parse(parsedBody);
 
       if (!username || typeof age !== 'number' || !Array.isArray(hobbies)) {
-        res.writeHead(400);
-        res.end(JSON.stringify({ message: 'Invalid data format' }));
+        response.writeHead(400);
+        response.end(JSON.stringify({ message: 'Invalid data format' }));
         return;
       }
 
       users[userIndex] = { id: userId, username, age, hobbies };
-      res.writeHead(200);
-      res.end(JSON.stringify(users[userIndex]));
+      response.writeHead(200);
+      response.end(JSON.stringify(users[userIndex]));
     } catch (error) {
-      res.writeHead(500);
-      res.end(JSON.stringify({ message: 'Server error' }));
+      response.writeHead(500);
+      response.end(JSON.stringify({ message: 'Server error' }));
     }
   });
 };
 
-export const deleteUserHandler = (req: IncomingMessage, res: ServerResponse, userId: string) => {
+export const deleteUserHandler = (request: IncomingMessage, response: ServerResponse, userId: string) => {
   if (!isUuid(userId)) {
-    res.writeHead(400);
-    res.end(JSON.stringify({ message: 'Invalid user ID' }));
+    response.writeHead(400);
+    response.end(JSON.stringify({ message: 'Invalid user ID' }));
     return;
   }
 
   const userIndex = users.findIndex(user => user.id === userId);
   if (userIndex === -1) {
-    res.writeHead(404);
-    res.end(JSON.stringify({ message: 'User not found' }));
+    response.writeHead(404);
+    response.end(JSON.stringify({ message: 'User not found' }));
     return;
   }
 
   users.splice(userIndex, 1);
-  res.writeHead(204);
-  res.end();
+  response.writeHead(204);
+  response.end();
 };
